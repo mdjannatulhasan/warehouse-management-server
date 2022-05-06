@@ -10,26 +10,27 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@inventory.v2xft.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-console.log(process.env.DB_USER);
-console.log(process.env.DB_PASS);
-async function run() {
-    try {
-        await client.connect();
-        const collections = client.db("inventory").collection("Testy");
-        // const user = { name: "Hasan", email: "shahmdjhm@gmail.com" };
-        // const result = await collections.insertOne(user);
-    } finally {
-        await client.close();
-    }
-}
-run().catch(console.dir);
 
 app.get("/", (req, res) => {
     res.send("Inventory server is running");
 });
 
-app.put("/additem", (req, res) => {
-    res.send("product added");
+app.put("/additem", async (req, res) => {
+    async function run() {
+        try {
+            await client.connect();
+            const products = client.db("inventory").collection("products");
+            const query = { name: req.body.name };
+            const update = { $set: req.body };
+            const options = { upsert: true };
+            await products.updateOne(query, update, options);
+        } finally {
+            await client.close();
+        }
+    }
+    run().catch(console.dir);
+
+    res.send({ success: true });
 });
 
 app.listen(port, () => {
