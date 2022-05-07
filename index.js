@@ -8,7 +8,7 @@ const port = process.env.PORT || 3030;
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@inventory.v2xft.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@inventory.v2xft.mongodb.net/myFirstDatabase?retryWrites=true`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 app.get("/", (req, res) => {
