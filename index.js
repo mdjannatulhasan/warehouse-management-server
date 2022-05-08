@@ -14,6 +14,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
+    console.log(authHeader);
     if (!authHeader) {
         return res.status(401).send({ message: "Unauthorised Access" });
     }
@@ -50,6 +51,12 @@ async function run() {
             const result = await products.findOne(query);
             res.send(result);
         });
+        app.delete("/delete/:id", verifyJWT, async (req, res) => {
+            const products = client.db("inventory").collection("products");
+            const query = { _id: ObjectId(req.params.id) };
+            const result = await products.deleteOne(query);
+            res.send(result);
+        });
         app.get("/items", async (req, res) => {
             const query = {};
             const cursor = await products.find(query);
@@ -68,7 +75,7 @@ async function run() {
                 res.status(403).send({ message: "Forbidden Access" });
             }
         });
-        app.put("/additem", verifyJWT, async (req, res) => {
+        app.post("/additem", verifyJWT, async (req, res) => {
             const query = { name: req.body.name };
             const update = { $set: req.body };
             const options = { upsert: true };
